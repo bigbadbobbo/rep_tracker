@@ -1,0 +1,137 @@
+<head>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <link rel="stylesheet" href="css/create.css" type="text/css">
+</head>
+<h1>Hi <%= user.name %></h1>
+<h2>Create Routine</h2>
+<form action="create" method="POST">
+  <div>
+    <label for="create">Routine</label>
+    <input type="text" id="create" name="create" required>
+  </div>
+  <div>
+    <input type="checkbox" id="is_private" name="is_private">
+    <label for="is_private">check if private</label>
+  </div>
+  <input type="hidden" name="numSets" id="numSets" value="1">
+
+<div class="form-set-container">
+
+    <div class="form-set" id="form-set-1">
+      <table>
+        <tr>
+          <td>
+      <select name="set" id="set" value="Select One">
+        <% if (exercises == null) {%>
+          <option value="makeSet">Create New Exercise (link below)</option>
+        <%} else {%>
+          <option value="-1">
+            Select One
+            </option>
+        <%  for (var i = 0; i < exercises.length; i++) { %>
+<!--          <h2 style="display:none;" id="hidden-name-< %= i %>">< %= names[i].name %></h2> -->
+           <option value="<%=exercises[i].id%>">
+             <%=exercises[i].name%>
+           </option>
+          <%}
+        }%>
+        </select>
+        </td>
+        <td>
+          <label for="reps">Reps</label>
+          <input type="number" id="reps" name="reps" min="0" value="-1" required>
+        </td>
+        <td>
+          <label for="weight">Weight</label>
+          <input type="number" id="weight" name="weight" step="0.1" min="0" value="-1">
+        </td>
+        <td>
+          <label for="timeUp">Time for Positive Engagement</label>
+          <input type="number" id="timeUp" name="timeUp" step="0.1" min="0" value="-1">
+        </td>
+        <td>
+          <label for="timeHold">Time to Hold</label>
+          <input type="number" id="timeHold" name="timeHold" step="0.1" min="0" value="-1">
+        </td>
+        <td>
+          <label for="timeDown">Time for Negative Engagement</label>
+          <input type="number" id="timeDown" name="timeDown" step="0.1" min="0" value="-1">
+        </td>
+        <td>
+          <label for="timeRest">Time for Rest Between Reps</label>
+          <input type="number" id="timeRest" name="timeRest" step="0.1" min="0" value="-1">
+        </td>
+        </tr>
+        </table>
+    </div>
+
+    <!-- We'll be adding additional inputs here -->
+
+</div>
+
+<button type="button" name="moreSets" id="moreSets">Add Another Set</button><br />
+  <button type="submit">Create Routine</button>
+</form>
+
+<a href='/exercise'>Create New Exercise</a>
+<a href='/'>Back</a>
+
+<script type="text/javascript">
+
+  var total = 1; // Our default for how many sets we have
+
+  $( document ).on( 'click', '#moreSets', function() {
+
+    var inputName = document.createElement('h5');
+
+    var message = document.createTextNode("(We should allow for sets to be added; but I've spent 5 days trying to get this to work)");
+
+    inputName.appendChild(message);
+
+    $(inputName).appendTo($('.form-set-container'));
+
+/*    total = total + 1;
+
+    var addBlockId = total;
+
+    var addBlock = document.createElement('div');
+    $(addBlock).addClass('form-set');
+    $(addBlock).attr('id','form-set-' + addBlockId);
+
+    var inputName = document.createElement('select');
+
+    $(inputName).attr('name','set-' + addBlockId);
+    $(inputName).attr('id','set-' + addBlockId);
+
+    $(inputName).appendTo($(addBlock));
+
+    $(addBlock).appendTo($('.form-set-container'));
+    $('#numSets').val(total);
+
+    var selName = document.getElementById('#set-' + addBlockId);
+
+    < % var j = 0; %>
+
+    for (var i = 0; i < < %= exercises.length %>; i++) {
+      var o = new Option(< %= exercises[j].id %>, < %= exercises[j].id %>);
+      o.innerHTML = < %= exercises[j].id %>;
+      $(selName).appendChild(o);
+      < % j++; %>
+//      alert(< %= exercises[0].id %>); // 1
+  //      alert(< %= exercises[1].id %>); // 3
+    //    alert(< %= exercises[2].id %>); // 6
+      //  alert(< %= exercises[3].id %>); // 7
+    //    alert(< %= exercises[4].id %>); // 5
+      //  alert(< %= exercises[5].id %>); // 4
+        //alert(< %= exercises[6].id %>); // 2
+    //    alert(< %= exercises[i].id %>);
+  //      alert(< %= exercises[0].name %>);
+    //    var temp = JSON.stringify(< %=names[i]%>);
+      //  alert(temp);
+    //      $(selName).append(new Option(< %= exercises[j].id %>, < %= exercises[j].id %>));
+  }
+  */
+
+  });
+</script>
+<!-- <script src="js/create.js" charset="utf-8"></script> -->

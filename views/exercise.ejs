@@ -1,0 +1,84 @@
+<head>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+</head>
+<h1>Hi <%= user.name %></h1>
+<h2>Create Exercise</h2>
+<form action="exercise" method="POST">
+  <div>
+    <label for="exercise">Name of Exercise</label>
+    <input type="text" id="exercise" name="exercise" required>
+  </div>
+  <input type="hidden" name="numAreas" id="numAreas" value="1">
+
+<div class="form-area-container">
+
+    <div class="form-area" id="form-area-1">
+      <select name="area" id="area" value="Select One">
+        <% if (areas == null) {%>
+          <option value="makeArea">Create New Area (link below)</option>
+        <%} else {%>
+          <div id="mydiv" data-names= <%= areas %>></div>
+          <option value="-1">
+            Select One
+            </option>
+        <%  for (var i = 0; i < areas.length; i++) { %>
+<!--          <h2 style="display:none;" id="hidden-name-< %= i %>">< %= names[i].name %></h2> -->
+           <option value="<%=areas[i].id%>">
+             <%=areas[i].name%>
+           </option>
+          <%}
+        }%>
+        </select>
+    </div>
+
+    <!-- We'll be adding additional inputs here -->
+
+</div>
+
+<!--  <button type="button" name="moreAreas" id="moreAreas">Add Another Area</button><br /> -->
+  <button type="submit">Create Exercise</button>
+</form>
+
+<a href='/area'>Create New Area</a>
+<a href='/create'>Back</a>
+<!-- <script type="text/javascript">
+
+  var total = 1; // Our default for how many areas we have
+
+    $( document ).on( 'click', '#moreAreas', function() {
+
+      total = total + 1;
+
+      var addBlockId = total;
+
+      var addBlock = document.createElement('div');
+      $(addBlock).addClass('form-area');
+      $(addBlock).attr('id','form-area-' + addBlockId);
+
+      var inputName = document.createElement('select');
+
+      $(inputName).attr('name','area-' + addBlockId);
+      $(inputName).attr('id','area-' + addBlockId);
+
+      $(inputName).appendTo($(addBlock));
+
+      $(addBlock).appendTo($('.form-area-container'));
+      $('#numAreas').val(total);
+
+      var selName = document.getElementById('#area-' + addBlockId);
+
+      //alert(nameArray);
+
+      var x = $("#hidden-name-6");
+      alert(x);
+
+    //  for (var i = 0; i < newNames.length; i++) {
+      for (var i = 0; i < < %= names.length %>; i++) {
+        alert(i);
+    //    var temp = JSON.stringify(< %=names[i]%>);
+      //  alert(temp);
+    //      $(selName).append(new Option(< %= names[i].name %>, < %= names[i].name %>));
+      }
+
+    });
+</script> -->

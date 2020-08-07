@@ -1,0 +1,48 @@
+<head>
+  <link rel="stylesheet" href="css/routine.css" type="text/css">
+</head>
+<h1>Hi <%= user.name %></h1>
+<h2><%= routine.name %></h2>
+<% if (sets == null || sets.length == 0) {%>
+  <h3>No Sets</h3>
+<%} else {%>
+  <table>
+  <% for (var i = 0; i < sets.length; i++) { %>
+      <tr>
+        <td>
+          <b><%= sets[i].name %></b>
+        </td>
+        <td>
+          Reps: <%= sets[i].reps %>
+        </td>
+        <% if (sets[i].weight != 0) { %>
+          <td>
+            Weight: <%= sets[i].weight %>
+          </td>
+        <% } %>
+        <% if (sets[i].positive != 0) { %>
+          <td>
+            Time for positive engagement: <%= sets[i].positive %> s
+          </td>
+        <% } %>
+        <% if (sets[i].hold != 0) { %>
+          <td>
+            Time to hold: <%= sets[i].hold %> s
+          </td>
+        <% } %>
+        <% if (sets[i].negative != 0) { %>
+          <td>
+            Time for negative engagement: <%= sets[i].negative %> s
+          </td>
+        <% } %>
+        <% if (sets[i].rest != 0) { %>
+          <td>
+            Time to rest in between reps: <%= sets[i].rest %> s
+          </td>
+        <% } %>
+      </tr>
+  <%}%>
+  </table>
+<%}%>
+<br><br>
+<a href='/search'>Back</a>

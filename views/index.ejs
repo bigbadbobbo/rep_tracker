@@ -1,0 +1,12 @@
+<h1>Hi <%= user.name %></h1>
+<table>
+    <tr>
+      <td><a href='/create'>Create Routine</a></td>
+      <td><a href='/search'>Search For Routines</a></td>
+    </tr>
+</table>
+
+</header>
+<form action="/logout?_method=DELETE" method="POST">
+  <button type="submit">Log Out</button>
+</form>

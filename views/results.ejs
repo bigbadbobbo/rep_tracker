@@ -1,0 +1,17 @@
+<h1>Hi <%= user.name %></h1>
+<h2>Search Results</h2>
+<% if (routines == null || routines.length == 0) {%>
+  <h3>No Results</h3>
+<%} else {%>
+  <table>
+  <% for (var i = 0; i < routines.length; i++) { %>
+      <tr>
+        <td>
+          <a href='/routine?id=<%= routines[i].id %>'><%= routines[i].name %></a>
+        </td>
+      </tr>
+  <%}%>
+  </table>
+<%}%>
+<br><br>
+<a href='/search'>Back</a>

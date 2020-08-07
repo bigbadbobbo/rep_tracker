@@ -1,0 +1,59 @@
+<head>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <link rel="stylesheet" href="css/search.css" type="text/css">
+</head>
+<h1>Hi <%= user.name %></h1>
+<h2>Find A Routine</h2>
+<form action="search" method="POST">
+
+<div class="form-set-container">
+
+    <div class="form-set" id="form-set-1">
+      <table>
+        <tr>
+          <td><div>
+            <label for="find">Search</label>
+            <input type="text" id="find" placeholder="Enter terms" name="find">
+          </div></td>
+          <td>
+            <label for="set">Exercise</label>
+      <select name="set" id="set" value="Select One">
+        <% if (exercises == null) {%>
+          <option value="makeSet">Create New Exercise (link below)</option>
+        <%} else {%>
+          <option value="-1">
+            Select One
+            </option>
+        <%  for (var i = 0; i < exercises.length; i++) { %>
+           <option value="<%=exercises[i].id%>">
+             <%=exercises[i].name%>
+           </option>
+          <%}
+        }%>
+        </select>
+        </td>
+        <td>
+          <label for="area">Area worked</label>
+        <select name="area" id="area" value="Select One">
+          <% if (areas == null) {%>
+            <option value="makeArea">Create New Area (link below)</option>
+          <%} else {%>
+            <div id="mydiv" data-names= <%= areas %>></div>
+            <option value="-1">
+              Select One
+              </option>
+          <%  for (var i = 0; i < areas.length; i++) { %>
+             <option value="<%=areas[i].id%>">
+               <%=areas[i].name%>
+             </option>
+            <%}
+          }%>
+          </select>
+          </td>
+        </tr>
+        </table>
+    </div>
+</div>
+  <button type="submit">Search</button>
+</form>
+<a href='/'>Back</a>
