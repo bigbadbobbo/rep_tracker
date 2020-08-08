@@ -197,7 +197,6 @@ app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
 }))
 
 app.post('/register', checkNotAuthenticated, async (req, response) => {
-  try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
 
     const text = 'INSERT INTO account (name, email, password) VALUES ($1, $2, $3)'
@@ -211,10 +210,6 @@ app.post('/register', checkNotAuthenticated, async (req, response) => {
         console.error(e.stack)
         response.redirect('/register')
       })
-    response.redirect('/login')
-  } catch {
-    response.redirect('/register')
-  }
 })
 
 app.post('/search', checkAuthenticated, (req, response) => {
