@@ -103,7 +103,6 @@ app.get('/routine', checkAuthenticated, async (req, res) => {
 })
 
 app.get("/create", checkAuthenticated, async (req, res) => {
-  try {
     const query = "SELECT * FROM exercise ORDER BY name ASC"
     client
       .query(query)
@@ -115,14 +114,9 @@ app.get("/create", checkAuthenticated, async (req, res) => {
         console.error(e.stack)
         res.redirect('/')
       })
-  }
-  catch(e) {
-    res.redirect('/')
-  }
 })
 
 app.get("/search", checkAuthenticated, async (req, res) => {
-  try {
     const query = "SELECT * FROM exercise ORDER BY name ASC"
     client
       .query(query)
@@ -144,14 +138,9 @@ app.get("/search", checkAuthenticated, async (req, res) => {
         console.error(e.stack)
         res.redirect('/')
       })
-  }
-  catch(e) {
-    res.redirect('/')
-  }
 })
 
 app.get("/exercise", checkAuthenticated, async (req, res) => {
-  try {
     var areaNames
     const query = "SELECT * FROM area ORDER BY name ASC"
     client
@@ -164,10 +153,6 @@ app.get("/exercise", checkAuthenticated, async (req, res) => {
         console.error(e.stack)
         res.redirect('/')
       })
-  }
-  catch(e) {
-    res.redirect('/')
-  }
 })
 
 app.get('/area', checkAuthenticated, (req, res) => {
@@ -448,7 +433,6 @@ app.post('/exercise', checkAuthenticated, (req, response) => {
 })
 
 app.post('/area', checkAuthenticated, (req, response) => {
-  try {
     const text = 'INSERT INTO area (name) VALUES ($1)'
     const values = [req.body.area]
     client
@@ -461,9 +445,6 @@ app.post('/area', checkAuthenticated, (req, response) => {
         response.redirect('/area')
       })
     response.redirect('/exercise')
-  } catch {
-    response.redirect('/area')
-  }
 })
 
 app.delete('/logout', (req, res) => {
