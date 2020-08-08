@@ -387,7 +387,6 @@ app.post('/create', checkAuthenticated, (req, response) => {
 })
 
 app.post('/exercise', checkAuthenticated, (req, response) => {
-  try {
     const text = 'INSERT INTO exercise (name, owner, is_public) VALUES ($1, $2, $3)'
     const values = [req.body.exercise, user.id, true]
     client
@@ -427,9 +426,6 @@ app.post('/exercise', checkAuthenticated, (req, response) => {
           response.redirect('/exercise')
         })
         response.redirect('/create')
-  } catch {
-    response.redirect('/exercise')
-  }
 })
 
 app.post('/area', checkAuthenticated, (req, response) => {
