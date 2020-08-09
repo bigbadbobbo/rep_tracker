@@ -1,0 +1,74 @@
+<head>
+  <link rel="stylesheet" href="css/routine.css" type="text/css">
+</head>
+<h1>Hi <%= user.name %></h1>
+<% if (sets == null || sets.length == 0) {%>
+  <h3>No Sets</h3>
+<%} else {%>
+  <form class="" action="editroutine" method="post">
+    <label for="create">Edit</label>
+    <input type="text" id="create" name="create" value="<%= routine.name %>" required>
+  <input type="hidden" name="routine" value="<%= routine.id %>">
+
+<!-- < % if (routine.is_public == true) { %>
+  <input type="checkbox" id="is_private" name="is_private">
+  <label for="is_private">check if private</label>
+ < % } else { %>
+  <input type="checkbox" id="is_private" name="is_private" checked>
+  <label for="is_private">check if private</label>
+ < % } %> -->
+
+This will be private
+
+  <table>
+  <% for (var i = 0; i < sets.length; i++) { %>
+      <tr>
+        <td>
+    <select name="set" id="set">
+      <% for (var j = 0; j < exercises.length; j++) { %>
+        <% if(sets[i].name == exercises[j].name){ %>
+         <option value="<%=exercises[j].id%>" selected>
+           <%=exercises[j].name%>
+         </option>
+         <% } else { %>
+           <option value="<%=exercises[j].id%>">
+             <%=exercises[j].name%>
+           </option>
+        <%}
+      }%>
+      </select>
+      </td>
+        <td>
+          <label for="reps">Reps</label>
+          <input type="number" id="reps" name="reps" min="0" value="<%= sets[i].reps %>" required>
+        </td>
+        <td>
+          <label for="weight">Weight</label>
+          <input type="number" id="weight" name="weight" step="0.1" min="0" value="<%= sets[i].weight %>">
+        </td>
+        <td>
+          <label for="timeUp">Time for Positive Engagement</label>
+          <input type="number" id="timeUp" name="timeUp" step="0.1" min="0" value="<%= sets[i].positive %>">
+        </td>
+        <td>
+          <label for="timeHold">Time to Hold</label>
+          <input type="number" id="timeHold" name="timeHold" step="0.1" min="0" value="<%= sets[i].hold %>">
+        </td>
+        <td>
+          <label for="timeDown">Time for Negative Engagement</label>
+          <input type="number" id="timeDown" name="timeDown" step="0.1" min="0" value="<%= sets[i].negative %>">
+        </td>
+        <td>
+          <label for="timeRest">Time for Rest Between Reps</label>
+          <input type="number" id="timeRest" name="timeRest" step="0.1" min="0" value="<%= sets[i].rest %>">
+        </td>
+      </tr>
+  <%}%>
+  </table>
+<%}%>
+<button type="submit" name="button">Save</button>
+</form>
+<br><br>
+<a href='/myroutine?id=<%= routine.id %>'>Back</a>
+<br><br>
+<a href='/'>Home</a>

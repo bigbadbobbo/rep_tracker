@@ -102,6 +102,106 @@ app.get('/routine', checkAuthenticated, async (req, res) => {
   })
 })
 
+app.get('/myroutine', checkAuthenticated, async (req, res) => {
+  const query = "SELECT * FROM routine WHERE id = $1"
+  const value = [req.query.id]
+  client
+  .query(query, value)
+  .then( response => {
+    routine = response.rows[0]
+    const query2 = "SELECT * FROM sets FULL OUTER JOIN exercise ON sets.exercise = exercise.id FULL OUTER JOIN comprises ON sets.id = comprises.sets WHERE sets.id IN (SELECT sets FROM comprises WHERE routine = $1) ORDER BY ordering ASC"
+    client
+    .query(query2, value)
+    .then( setss => {
+      sets = setss.rows
+      res.render('./myroutine.ejs', { user: user, routine: routine, sets: sets })
+    })
+    .catch(e => {
+      console.error(e.stack)
+      res.redirect('/')
+    })
+  })
+  .catch(e => {
+    console.error(e.stack)
+    res.redirect('/')
+  })
+})
+
+app.get('/editroutine', checkAuthenticated, async (req, res) => {
+  const query = "SELECT * FROM routine WHERE id = $1"
+  const value = [req.query.id]
+  client
+  .query(query, value)
+  .then( response => {
+    routine = response.rows[0]
+    const query2 = "SELECT * FROM sets FULL OUTER JOIN exercise ON sets.exercise = exercise.id FULL OUTER JOIN comprises ON sets.id = comprises.sets WHERE sets.id IN (SELECT sets FROM comprises WHERE routine = $1) ORDER BY ordering ASC"
+    client
+    .query(query2, value)
+    .then( setss => {
+      sets = setss.rows
+      const query3 = "SELECT * FROM exercise ORDER BY name ASC"
+      client
+        .query(query3)
+        .then( response3 => {
+          exercises = response3.rows
+          res.render('./editroutine.ejs', { user: user, routine: routine, sets: sets, exercises: exercises })
+        })
+        .catch(e => {
+          console.error(e.stack)
+          res.redirect('/')
+        })
+    })
+    .catch(e => {
+      console.error(e.stack)
+      res.redirect('/')
+    })
+  })
+  .catch(e => {
+    console.error(e.stack)
+    res.redirect('/')
+  })
+})
+
+app.get('/prepmyroutines', checkAuthenticated, async (req, res) => {
+  const text2 = 'SELECT id, name FROM routine WHERE id IN (SELECT routine FROM myroutines WHERE account = $1)'
+  const value2 = [user.id]
+  client
+  .query(text2, value2)
+  .then(routine => {
+    routines = routine.rows
+    res.redirect('/myroutines')
+  })
+  .catch(e => {
+    console.error(e.stack)
+    res.redirect('/')
+  })
+})
+
+app.get('/addtomyroutines', checkAuthenticated, async (req, res) => {
+  const query = 'INSERT INTO myroutines (routine, account) VALUES ($1, $2)'
+  const value = [req.query.id, user.id]
+  client
+  .query(query, value)
+  .then( response => {
+    const text2 = 'SELECT id, name FROM routine WHERE id IN (SELECT routine FROM myroutines WHERE account = $1)'
+    const value2 = [user.id]
+    client
+    .query(text2, value2)
+    .then(routine => {
+      routines = routine.rows
+      res.redirect('/myroutines')
+    })
+    .catch(e => {
+      console.error(e.stack)
+      res.redirect('/')
+    })
+  })
+  .catch(e => {
+    console.error(e.stack)
+    res.redirect('/')
+  })
+})
+
 app.get("/create", checkAuthenticated, async (req, res) => {
     const query = "SELECT * FROM exercise ORDER BY name ASC"
     client
@@ -157,6 +257,10 @@ app.get("/exercise", checkAuthenticated, async (req, res) => {
 
 app.get('/area', checkAuthenticated, (req, res) => {
   res.render('area.ejs', { user: user })
+})
+
+app.get('/myroutines', checkAuthenticated, (req, res) => {
+  res.render('myroutines.ejs', { user: user, routines: routines })
 })
 
 app.get('/results', checkAuthenticated, (req, res) => {
@@ -323,6 +427,100 @@ app.post('/search', checkAuthenticated, (req, response) => {
       console.error(e.stack)
       response.redirect('/search')
     })
+  }
+})
+
+app.post('/editroutine', checkAuthenticated, (req, response) => {
+  const text = 'INSERT INTO routine (name, owner, is_public) VALUES ($1, $2, $3)'
+  const isPublic = false
+  const values = [req.body.create, user.id, isPublic]
+  if(req.body.create == -1)
+  {
+    response.redirect('/editroutine')
+  }
+  else{
+    client
+      .query(text, values)
+      .then(res => {
+        console.log('first query');
+        const text2 = 'SELECT id FROM routine WHERE name = $1 AND owner = $2 AND is_public = $3 ORDER BY id DESC'
+        client
+        .query(text2, values)
+        .then(resp => {
+          console.log('second query');
+          console.log('exercise = ' + req.body.set);
+          console.log('reps = ' + req.body.reps);
+          console.log('weight = ' + req.body.weight);
+          console.log('positive = ' + req.body.timeUp);
+          console.log('hold = ' + req.body.timeHold);
+          console.log('negative = ' + req.body.timeDown);
+          console.log('rest = ' + req.body.timeRest);
+          // NEED TO CREATE SET AND GET ID
+          const text3 = 'INSERT INTO sets (exercise, reps, weight, positive, hold, negative, rest) VALUES ($1, $2, $3, $4, $5, $6, $7)'
+          const value3 = [req.body.set, req.body.reps, req.body.weight, req.body.timeUp, req.body.timeHold, req.body.timeDown, req.body.timeRest]
+          client
+            .query(text3, value3)
+            .then(resps => {
+              console.log('third query');
+              const text4 = 'SELECT id FROM sets WHERE exercise = $1 AND reps = $2 AND weight = $3 AND positive = $4 AND hold = $5 AND negative = $6 AND rest = $7'
+              client
+              .query(text4, value3)
+              .then(setId => {
+                console.log('fourth query');
+                const text5 = 'INSERT INTO comprises (routine, sets) VALUES ($1, $2)'
+                const value5 = [resp.rows[0].id, setId.rows[0].id]
+                client
+                .query(text5, value5)
+                .then(res5 => {
+                  console.log('fifth query');
+                  const text6 = 'DELETE FROM myroutines WHERE routine = $1 AND account = $2'
+                  const value6 = [req.body.routine, user.id]
+                  client
+                  .query(text6, value6)
+                  .then(res6 => {
+                    console.log('sixth query');
+                    const text7 = 'INSERT INTO myroutines (routine, account) VALUES ($1, $2)'
+                    const value7 = [resp.rows[0].id, user.id]
+                    client
+                    .query(text7, value7)
+                    .then(res7 => {
+                      console.log('seventh query');
+                      response.redirect('/')
+                    })
+                    .catch(e => {
+                      console.error(e.stack)
+                      response.redirect('/editroutine')
+                    })
+                  })
+                  .catch(e => {
+                    console.error(e.stack)
+                    response.redirect('/editroutine')
+                  })
+                })
+                .catch(e => {
+                  console.error(e.stack)
+                  response.redirect('/editroutine')
+                })
+              })
+              .catch(e => {
+                console.error(e.stack)
+                response.redirect('/editroutine')
+              })
+            })
+            .catch(e => {
+              console.error(e.stack)
+              response.redirect('/editroutine')
+            })
+        })
+        .catch(e => {
+          console.error(e.stack)
+          response.redirect('/editroutine')
+        })
+      })
+      .catch(e => {
+        console.error(e.stack)
+        response.redirect('/editroutine')
+      })
   }
 })
 
