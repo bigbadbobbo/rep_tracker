@@ -127,6 +127,52 @@ app.get('/myroutine', checkAuthenticated, async (req, res) => {
   })
 })
 
+app.get('/launchroutine', checkAuthenticated, async (req, res) => {
+  const query = "SELECT name FROM routine WHERE id = $1"
+  const value = [req.query.id]
+  client
+  .query(query, value)
+  .then( response => {
+    routine = response.rows[0].name
+    const rightnow = new Date().getTime()
+    const value2 = [routine, user.id, rightnow]
+    const query2 = "INSERT INTO completed (name, account, happened) VALUES ($1, $2, $3)"
+    client
+    .query(query2, value2)
+    .then( rezie => {
+      const query7 = "SELECT id FROM completed WHERE name = $1 AND account = $2 AND happened = $3 ORDER BY happened DESC"
+      client
+      .query(query7, value2)
+      .then( complete => {
+        const completed = complete.rows[0]
+        const queryT = "SELECT * FROM sets FULL OUTER JOIN exercise ON sets.exercise = exercise.id FULL OUTER JOIN comprises ON sets.id = comprises.sets WHERE sets.id IN (SELECT sets FROM comprises WHERE routine = $1) ORDER BY ordering ASC"
+        client
+        .query(queryT, value)
+        .then( setss => {
+          sets = setss.rows
+          res.render('./launchroutine.ejs', { user: user, routine: routine, sets: sets, completed: completed })
+        })
+        .catch(e => {
+          console.error(e.stack)
+          res.redirect('/')
+        })
+      })
+      .catch(e => {
+        console.error(e.stack)
+        res.redirect('/')
+      })
+    })
+    .catch(e => {
+      console.error(e.stack)
+      res.redirect('/')
+    })
+  })
+  .catch(e => {
+    console.error(e.stack)
+    res.redirect('/')
+  })
+})
+
 app.get('/editroutine', checkAuthenticated, async (req, res) => {
   const query = "SELECT * FROM routine WHERE id = $1"
   const value = [req.query.id]
@@ -427,6 +473,116 @@ app.post('/search', checkAuthenticated, (req, response) => {
       console.error(e.stack)
       response.redirect('/search')
     })
+  }
+})
+
+app.post('/launchroutine', checkAuthenticated, (req, response) => {
+  const query = "UPDATE completed SET notes = $1 WHERE id = $2"
+  const values = [req.body.notes, req.body.routineid]
+//  console.log('notes = ' + req.body.notes);
+//  console.log('routineid = ' + req.body.routineid);
+  if(req.body.create == -1)
+  {
+    response.redirect('/')
+  }
+  else{
+    client
+      .query(query, values)
+      .then(res => {
+        //console.log('first query');
+
+          //console.log('second query');
+        /*  console.log('exercise = ' + req.body.exercise);
+          console.log('reps = ' + req.body.reps);
+          console.log('weight = ' + req.body.weight);
+          console.log('positive = ' + req.body.positive);
+          console.log('hold = ' + req.body.hold);
+          console.log('negative = ' + req.body.negative);
+          console.log('rest = ' + req.body.rest);
+          console.log('hweight = ' + req.body.hweight);
+          console.log('hreps = ' + req.body.hreps);*/
+
+          // NEED TO CREATE SET AND GET ID
+          const text3 = 'INSERT INTO performed (exercise, reps, weight, positive, hold, negative, rest, hweight, hreps) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id'
+          const value3 = [req.body.exercise, req.body.reps, req.body.weight, req.body.positive, req.body.hold, req.body.negative, req.body.rest, req.body.hweight, req.body.hreps]
+          client
+            .query(text3, value3)
+            .then(setId => {
+          /*    console.log('third query');
+              let exercise = req.body.exercise;
+              let reps = req.body.reps;
+              let weight = req.body.weight;
+              if( weight == null)
+              {
+                weight == '';
+              }
+              let positive = req.body.positive;
+              if( positive == null)
+              {
+                positive == '';
+              }
+              let hold = req.body.hold;
+              if( hold == null)
+              {
+                hold == '';
+              }
+              let negative = req.body.negative;
+              if( negative == null)
+              {
+                negative == '';
+              }
+              let rest = req.body.rest;
+              if( rest == null)
+              {
+                console.log('rest is null');
+                rest == '';
+              }
+              let hweight = req.body.hweight;
+              if( hweight == null)
+              {
+                hweight == '';
+              }
+              let hreps = req.body.hreps;
+              if( hreps == null)
+              {
+                hreps == '';
+              }
+              const text4 = 'SELECT id FROM performed WHERE exercise = $1 AND reps = $2 AND weight = $3 AND positive = $4 AND hold = $5 AND negative = $6 AND rest = $7 and hweight = $8 and hreps = $9'
+              const value4 = [exercise, reps, weight, positive, hold, negative, rest, hweight, hreps]
+              client
+              .query(text4, value4)
+              .then(setId => {*/
+              //..  console.log('fourth query');
+              //  console.log(setId);
+                const text5 = 'INSERT INTO consistsof (completed, performed) VALUES ($1, $2)'
+                const value5 = [req.body.routineid, setId.rows[0].id]
+                client
+                .query(text5, value5)
+                .then(res5 => {
+                //  console.log('fifth query');
+                      response.redirect('/')
+
+                })
+                .catch(e => {
+                  console.error(e.stack)
+                  response.redirect('/')
+                })
+              /*})
+              .catch(e => {
+                console.error(e.stack)
+                response.redirect('/')
+              })*/
+            })
+            .catch(e => {
+              console.error(e.stack)
+              response.redirect('/')
+            })
+
+      })
+      .catch(e => {
+        console.error(e.stack)
+        response.redirect('/')
+      })
   }
 })
 

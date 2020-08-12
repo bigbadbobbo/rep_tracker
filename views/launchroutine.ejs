@@ -1,0 +1,119 @@
+<head>
+  <link rel="stylesheet" href="css/routine.css" type="text/css">
+</head>
+<h1>Hi <%= user.name %></h1>
+<h2><%= routine.name %></h2>
+<% if (sets == null || sets.length == 0) {%>
+  <h3>No Sets</h3>
+<%} else {%>
+  <form class="" action="launchroutine" method="post">
+    <input type="hidden" name="routineid" id="routineid" value="<%= completed.id %>">
+  <table>
+    <tr>
+      <td>
+        Exercise
+      </td>
+      <td>
+        Reps
+      </td>
+      <td>
+        Weight
+      </td>
+      <td>
+        Positive engagement
+      </td>
+      <td>
+        Hold
+      </td>
+      <td>
+        Negative engagement
+      </td>
+      <td>
+        Rest
+      </td>
+      <td>
+        How was the weight?
+      </td>
+      <td>
+        How about the reps?
+      </td>
+    </tr>
+
+  <% for (var i = 0; i < sets.length; i++) { %>
+      <tr>
+        <td>
+          <input type="hidden" name="exercise" id="exercise" value="<%= sets[i].name %>">
+            <b><%= sets[i].name %></b>
+        </td>
+        <td>
+          <input type="hidden" name="reps" id="reps" value="<%= sets[i].reps %>">
+            <%= sets[i].reps %>
+        </td>
+        <% if (sets[i].weight != 0) { %>
+          <td>
+            <input type="hidden" name="weight" id="weight" value="<%= sets[i].weight %>">
+            <%= sets[i].weight %>
+          </td>
+        <% } else { %>
+          <td></td>
+        <% } %>
+        <% if (sets[i].positive != 0) { %>
+          <td>
+            <input type="hidden" name="positive" id="positive" value="<%= sets[i].positive %>">
+            <%= sets[i].positive %> s
+          </td>
+        <% } else { %>
+            <td></td>
+        <% } %>
+        <% if (sets[i].hold != 0) { %>
+          <td>
+            <input type="hidden" name="hold" id="hold" value="<%= sets[i].hold %>">
+            <%= sets[i].hold %> s
+          </td>
+        <% } else { %>
+          <td></td>
+        <% } %>
+        <% if (sets[i].negative != 0) { %>
+          <td>
+            <input type="hidden" name="negative" id="negative" value="<%= sets[i].negative %>">
+            <%= sets[i].negative %> s
+          </td>
+          <% } else { %>
+            <td></td>
+          <% } %>
+        <% if (sets[i].rest != 0) { %>
+          <td>
+            <input type="hidden" name="rest" id="rest" value="<%= sets[i].rest %>">
+            <%= sets[i].rest %> s
+          </td>
+          <% } else { %>
+            <td></td>
+          <% } %>
+          <td>
+            <input type="radio" id="heavy" name="hweight" value="heavy">
+            <label for="heavy">Too Heavy</label><br>
+            <input type="radio" id="good" name="hweight" value="good">
+            <label for="good">Good</label><br>
+            <input type="radio" id="light" name="hweight" value="light">
+            <label for="light">Too Light</label>
+          </td>
+          <td>
+            <input type="radio" id="much" name="hreps" value="much">
+            <label for="much">Too Much</label><br>
+            <input type="radio" id="rgood" name="hreps" value="good">
+            <label for="rgood">Good</label><br>
+            <input type="radio" id="few" name="hreps" value="few">
+            <label for="few">Too Few</label>
+          </td>
+      </tr>
+  <%}%>
+  </table>
+  <br><br><br>
+  <label for="notes">Notes</label><br /><br  />
+  <textarea name="notes" id="notes" rows="8" cols="80"></textarea><br /><br />
+  <button type="submit" name="button">Finished</button>
+<%}%>
+<br><br>
+<a href='/myroutines'>Back</a>
+<br><br>
+<a href='/'>Home</a>
