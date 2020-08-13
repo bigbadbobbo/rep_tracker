@@ -15,6 +15,8 @@ let user
 
 let routines
 
+let schedule
+
 //const connectionString = 'postgres://postgres@localhost:5432/database'
 
 const client = new Client({
@@ -136,14 +138,14 @@ app.get('/launchroutine', checkAuthenticated, async (req, res) => {
     routine = response.rows[0].name
     const rightnow = new Date().getTime()
     const value2 = [routine, user.id, rightnow]
-    const query2 = "INSERT INTO completed (name, account, happened) VALUES ($1, $2, $3)"
+    const query2 = "INSERT INTO completed (name, account, happened) VALUES ($1, $2, $3) returning id"
     client
     .query(query2, value2)
-    .then( rezie => {
-      const query7 = "SELECT id FROM completed WHERE name = $1 AND account = $2 AND happened = $3 ORDER BY happened DESC"
-      client
+    .then( complete => {
+      /*const query7 = "SELECT id FROM completed WHERE name = $1 AND account = $2 AND happened = $3 ORDER BY happened DESC"
+      /*client
       .query(query7, value2)
-      .then( complete => {
+      .then( complete => {*/
         const completed = complete.rows[0]
         const queryT = "SELECT * FROM sets FULL OUTER JOIN exercise ON sets.exercise = exercise.id FULL OUTER JOIN comprises ON sets.id = comprises.sets WHERE sets.id IN (SELECT sets FROM comprises WHERE routine = $1) ORDER BY ordering ASC"
         client
@@ -156,11 +158,11 @@ app.get('/launchroutine', checkAuthenticated, async (req, res) => {
           console.error(e.stack)
           res.redirect('/')
         })
-      })
+      /*})
       .catch(e => {
         console.error(e.stack)
         res.redirect('/')
-      })
+      })*/
     })
     .catch(e => {
       console.error(e.stack)
@@ -201,6 +203,33 @@ app.get('/editroutine', checkAuthenticated, async (req, res) => {
       console.error(e.stack)
       res.redirect('/')
     })
+  })
+  .catch(e => {
+    console.error(e.stack)
+    res.redirect('/')
+  })
+})
+
+app.get('/prepschedule', checkAuthenticated, async (req, res) => {
+  const text2 = 'SELECT id, name FROM routine WHERE id IN (SELECT routine FROM myroutines WHERE account = $1)'
+  const value2 = [user.id]
+  client
+  .query(text2, value2)
+  .then(routine => {
+    routines = routine.rows
+    const text = 'SELECT * FROM queue FULL OUTER JOIN routine ON queue.routine = routine.id WHERE queue.account = $1 ORDER BY queue.ordering ASC'
+    client
+    .query(text, value2)
+    .then(sche => {
+      schedule = sche.rows
+  //    console.log(schedule);
+      res.redirect('/schedule')
+    })
+    .catch(e => {
+      console.error(e.stack)
+      res.redirect('/')
+    })
+
   })
   .catch(e => {
     console.error(e.stack)
@@ -307,6 +336,10 @@ app.get('/area', checkAuthenticated, (req, res) => {
 
 app.get('/myroutines', checkAuthenticated, (req, res) => {
   res.render('myroutines.ejs', { user: user, routines: routines })
+})
+
+app.get('/schedule', checkAuthenticated, (req, res) => {
+  res.render('schedule.ejs', { user: user, routines: routines, schedule: schedule })
 })
 
 app.get('/results', checkAuthenticated, (req, res) => {
@@ -587,7 +620,7 @@ app.post('/launchroutine', checkAuthenticated, (req, response) => {
 })
 
 app.post('/editroutine', checkAuthenticated, (req, response) => {
-  const text = 'INSERT INTO routine (name, owner, is_public) VALUES ($1, $2, $3)'
+  const text = 'INSERT INTO routine (name, owner, is_public) VALUES ($1, $2, $3) RETURNING id'
   const isPublic = false
   const values = [req.body.create, user.id, isPublic]
   if(req.body.create == -1)
@@ -597,8 +630,8 @@ app.post('/editroutine', checkAuthenticated, (req, response) => {
   else{
     client
       .query(text, values)
-      .then(res => {
-        console.log('first query');
+      .then(resp => {
+        /* console.log('first query');
         const text2 = 'SELECT id FROM routine WHERE name = $1 AND owner = $2 AND is_public = $3 ORDER BY id DESC'
         client
         .query(text2, values)
@@ -610,7 +643,7 @@ app.post('/editroutine', checkAuthenticated, (req, response) => {
           console.log('positive = ' + req.body.timeUp);
           console.log('hold = ' + req.body.timeHold);
           console.log('negative = ' + req.body.timeDown);
-          console.log('rest = ' + req.body.timeRest);
+          console.log('rest = ' + req.body.timeRest);*/
           // NEED TO CREATE SET AND GET ID
           const text3 = 'INSERT INTO sets (exercise, reps, weight, positive, hold, negative, rest) VALUES ($1, $2, $3, $4, $5, $6, $7)'
           const value3 = [req.body.set, req.body.reps, req.body.weight, req.body.timeUp, req.body.timeHold, req.body.timeDown, req.body.timeRest]
@@ -667,11 +700,11 @@ app.post('/editroutine', checkAuthenticated, (req, response) => {
               console.error(e.stack)
               response.redirect('/editroutine')
             })
-        })
+        /*})
         .catch(e => {
           console.error(e.stack)
           response.redirect('/editroutine')
-        })
+        })*/
       })
       .catch(e => {
         console.error(e.stack)
@@ -681,7 +714,7 @@ app.post('/editroutine', checkAuthenticated, (req, response) => {
 })
 
 app.post('/create', checkAuthenticated, (req, response) => {
-  const text = 'INSERT INTO routine (name, owner, is_public) VALUES ($1, $2, $3)'
+  const text = 'INSERT INTO routine (name, owner, is_public) VALUES ($1, $2, $3) RETURNING id'
   const isPublic = !req.body.is_private
   const values = [req.body.create, user.id, isPublic]
   if(req.body.create == -1)
@@ -691,21 +724,21 @@ app.post('/create', checkAuthenticated, (req, response) => {
   else{
     client
       .query(text, values)
-      .then(res => {
-        const text2 = 'SELECT id FROM routine WHERE name = $1 AND owner = $2 AND is_public = $3'
+      .then(resp => {
+        /*const text2 = 'SELECT id FROM routine WHERE name = $1 AND owner = $2 AND is_public = $3'
         client
         .query(text2, values)
-        .then(resp => {
+        .then(resp => {*/
           // NEED TO CREATE SET AND GET ID
-          const text3 = 'INSERT INTO sets (exercise, reps, weight, positive, hold, negative, rest) VALUES ($1, $2, $3, $4, $5, $6, $7)'
+          const text3 = 'INSERT INTO sets (exercise, reps, weight, positive, hold, negative, rest) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id'
           const value3 = [req.body.set, req.body.reps, req.body.weight, req.body.timeUp, req.body.timeHold, req.body.timeDown, req.body.timeRest]
           client
             .query(text3, value3)
-            .then(resps => {
-              const text4 = 'SELECT id FROM sets WHERE exercise = $1 AND reps = $2 AND weight = $3 AND positive = $4 AND hold = $5 AND negative = $6 AND rest = $7'
+            .then(setId => {
+              /*const text4 = 'SELECT id FROM sets WHERE exercise = $1 AND reps = $2 AND weight = $3 AND positive = $4 AND hold = $5 AND negative = $6 AND rest = $7'
               client
               .query(text4, value3)
-              .then(setId => {
+              .then(setId => {*/
                 const text5 = 'INSERT INTO comprises (routine, sets) VALUES ($1, $2)'
                 const value5 = [resp.rows[0].id, setId.rows[0].id]
                 client
@@ -717,21 +750,21 @@ app.post('/create', checkAuthenticated, (req, response) => {
                   console.error(e.stack)
                   response.redirect('/create')
                 })
-              })
+              /*})
               .catch(e => {
                 console.error(e.stack)
                 response.redirect('/create')
-              })
+              })*/
             })
             .catch(e => {
               console.error(e.stack)
               response.redirect('/create')
             })
-        })
+        /*})
         .catch(e => {
           console.error(e.stack)
           response.redirect('/create')
-        })
+        })*/
       })
       .catch(e => {
         console.error(e.stack)
@@ -741,22 +774,22 @@ app.post('/create', checkAuthenticated, (req, response) => {
 })
 
 app.post('/exercise', checkAuthenticated, (req, response) => {
-    const text = 'INSERT INTO exercise (name, owner, is_public) VALUES ($1, $2, $3)'
+    const text = 'INSERT INTO exercise (name, owner, is_public) VALUES ($1, $2, $3) RETURNING id'
     const values = [req.body.exercise, user.id, true]
     client
       .query(text, values)
-      .then(res => {
+      .then(resp => {
         if(req.body.area == -1)
         {
           response.redirect('/exercise')
         }
         else
         {
-          const text2 = 'SELECT id FROM exercise WHERE name = $1'
+          /*const text2 = 'SELECT id FROM exercise WHERE name = $1'
           const value2 = [req.body.exercise]
           client
             .query(text2, value2)
-            .then(resp => {
+            .then(resp => {*/
               const text3 = 'INSERT INTO worked (exercise, area) VALUES ($1, $2)'
               const value3 = [resp.rows[0].id, req.body.area]
               client
@@ -768,11 +801,11 @@ app.post('/exercise', checkAuthenticated, (req, response) => {
                   console.error(e.stack)
                   response.redirect('/exercise')
                 })
-            })
+            /*})
             .catch(e => {
               console.error(e.stack)
               response.redirect('/exercise')
-            })
+            })*/
           }
         })
         .catch(e => {

@@ -1,0 +1,114 @@
+<head>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <link rel="stylesheet" href="css/create.css" type="text/css">
+</head>
+<h1>Hi <%= user.name %></h1>
+<h2>My Schedule</h2>
+  <table>
+    <tr>
+      <td>
+        <table>
+          <% if (routines == null || routines.length == 0) {%>
+            <h3>No Routines</h3>
+          <%} else {%>
+            <% for (var i = 0; i < routines.length; i++) { %>
+              <tr>
+                <td>
+                  <button type="button" onclick="buttonHandler(<%= routines[i].id %>, '<%= routines[i].name %>')" id="<%= routines[i].id %>" name="<%= routines[i].id %>">
+                    <%= routines[i].name %>
+                  </button>
+                  <input type="hidden" name="total" id="total" value="<%= schedule.length %>">
+                </td>
+              </tr>
+            <%}%>
+          <%}%>
+        </table>
+      </td>
+      <td>
+        <table id="sch">
+          <% if (schedule == null || schedule.length == 0) {%>
+            <tr>
+              <h3 id="norot">No Routines in Schedule</h3>
+            </tr>
+          <%} else {%>
+            <% for (var i = 0; i < schedule.length; i++) { %>
+              <tr>
+                <td>
+                  <a href='/myroutine?id=<%= schedule[i].id %>'><%= schedule[i].name %></a>
+                </td>
+              </tr>
+            <%}%>
+          <%}%>
+        </table>
+      </td>
+    </tr>
+  </table>
+      <br><br>
+<a href='/'>Back</a>
+<script type="text/javascript">
+  function buttonHandler(rid, rname)
+  {
+  //  alert(rid)
+  //  alert(rname)
+
+//    var table = document.getElementById("sch")
+
+//    alert(table)
+
+    var total = $('#total').val()
+    if(total == 0)
+    {
+  /*    table.deleteRow(0);
+      var row = table.insertRow(0)
+      var delet = row.insertCell(0)
+      var exercise = row.insertCell(1)
+      delet.innerHTML = "X"
+      exercise.innerHTML = '<div name="'+rid+'" value="'+rid+'">'+rname+'</div>'*/
+      $('#norot').remove()
+      $('#sch').append('<tr id="'+total+'"><td><div class="delete_button" id="'+total+'"><button type="button" onclick="deleteButtonHandler('+total+')" id="'+rid+'_delete" name="'+rid+'_delete"> X </button></td><td><div name="'+rid+'" id="'+rid+'" value="'+rid+'"><b>'+rname+'</b></div></div></td></tr>')
+      total++
+      $('#total').val(total)
+    }
+    else
+    {
+/*      var row = table.insertRow()
+      var delet = row.insertCell(0)
+      var exercise = row.insertCell(1)
+      var up = row.insertCell(2)
+      delet.innerHTML = "X"
+      exercise.innerHTML = '<div name="'+rid+'" value="'+rid+'">'+rname+'</div>'
+      up.innerHTML = "^"*/
+
+      $('#sch').append('<tr id="'+total+'"><td><div class="delete_button"><button type="button" onclick="deleteButtonHandler('+total+')" id="'+rid+'_delete" name="'+rid+'_delete"> X </button></td><td><div name="'+rid+'" id="'+rid+'" value="'+rid+'">'+rname+'</div></td><td><button type="button" onclick="arrowButtonHandler('+total+')" class="up_button" name="'+rid+'_up"> ^ </button></div></td></tr>')
+      total++
+      $('#total').val(total)
+    }
+    /*if (< %= schedule %> == null || < %= schedule.length %> == 0) {
+      alert('in here')
+      total = 0
+    }/* else {
+      total = < %= schedule.length %>
+    }*/
+  //  alert(total) */
+}
+
+function arrowButtonHandler(bottom)
+{
+  jQuery("#"+bottom).prev().before(jQuery("#"+bottom));
+}
+
+function deleteButtonHandler(remove)
+{
+  var total = $('#total').val()
+  $('table#sch tr#' + remove.toString()).remove()
+  var num_rows = $('#sch tr').length
+  if(num_rows == 1)
+  {
+    $('#sch').append('<h3 id="norot">No Routines in Schedule</h3>')
+  }
+  else
+  {
+    var first_row = $('#sch').find('tr').eq(0)
+  }
+}
+</script>
